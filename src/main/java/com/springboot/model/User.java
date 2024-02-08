@@ -1,17 +1,26 @@
 package com.springboot.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import java.util.UUID;
 //import java.util.Date;
 
 @Entity
 @Table(name = "users")
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+    @NotBlank(message="Nombre es un campo requerido")
     private String name;
     private String email;
-
+//    private String password;
+//    // private ArrayList<Phone> phones;
+//    private Date created;
+//    private Date modified;
+//    private Date last_login;
+//    private String token;
+//    private boolean isactive;
 
 
 
@@ -19,11 +28,12 @@ public class User {
 //        this.phones = new ArrayList<>();
 //    }
 
-    public Long getId() {
+
+    public UUID getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
