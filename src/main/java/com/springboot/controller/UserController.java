@@ -1,17 +1,20 @@
 package com.springboot.controller;
-import java.util.List;
+
 import com.springboot.model.User;
+import com.springboot.model.UserResponse;
 import com.springboot.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import com.springboot.error.UserNotFoundException;
+import com.springboot.error.EmailExistentException;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.ResponseEntity;
 
+import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.Date;
+
 
 @RestController
 @RequestMapping("api/users")
@@ -31,8 +34,16 @@ public class UserController {
     }
 
     @PostMapping
-    public User createUser(@Valid @RequestBody User user){
-        return userService.create(user);
+    public UserResponse createUser(@Valid @RequestBody User user) throws EmailExistentException{
+        user.setIsactive(true);
+        user.setCreated(new Date());
+        UserResponse res = new UserResponse();
+        userService.create(user);
+        res.setId(user.getId_user().toString());
+        res.setCreated(user.getCreated());
+        res.setToken(user.getToken());
+        res.setIsactive(user.isIsactive());
+        return res;
     }
 
     @DeleteMapping("{id}")
@@ -44,7 +55,7 @@ public class UserController {
         public Map<String, Object> get() {
         Map<String, Object> map = new HashMap<>();
         map.put("key1", "value1");
-        map.put("results", "somePOJO");
+        map.put("results", "value2");
         return map;
     }
 }

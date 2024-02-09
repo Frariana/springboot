@@ -1,6 +1,5 @@
 package com.springboot.error;
 import com.springboot.error.dto.ErrorMessage;
-import com.springboot.error.UserNotFoundException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -33,4 +32,13 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
         });
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
     }
+
+    @ExceptionHandler(EmailExistentException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ResponseEntity<ErrorMessage> EmailExistentException(EmailExistentException exception){
+        ErrorMessage message = new ErrorMessage(HttpStatus.FOUND, exception.getMessage());
+        return ResponseEntity.status(HttpStatus.FOUND).body(message);
+    }
+
+
 }
