@@ -19,7 +19,9 @@ public class User {
     private UUID id_user;
     @NotBlank(message="Campo requerido")
     private String name;
+    @NotBlank(message="Campo requerido")
     private String email;
+    @NotBlank(message="Campo requerido")
     private String password;
     @OneToMany(cascade = CascadeType.ALL)
     private List<Phone> phones = new ArrayList<>();
