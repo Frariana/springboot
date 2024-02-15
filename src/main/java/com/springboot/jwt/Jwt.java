@@ -14,29 +14,53 @@ import javax.crypto.SecretKey;
 public class Jwt {
 
     public static final int EXPIRATION_IN_MINUTES = 30;
-    public static final String SECRET_KEY = "MI CLAVE ES SECRETA";
+    public static final String SECRET_KEY = "esta es mi super clave super secreta y super indecifrable 0987654321";
 
     public String getJwt(String subject) {
-//        Map<String, Object> extraClaims = new HashMap<>();
-//        extraClaims.put("name", "frariana c");
-//        Date issuedAt = new Date(System.currentTimeMillis());
-//        Date expiration = new Date(issuedAt.getTime() + EXPIRATION_IN_MINUTES * 60 * 1000);
-//        String jwt = Jwts.builder()
-//                .header()
-//                .type("JWT")
-//                .and()
-//                .subject("fcastro")
-//                .expiration(expiration)
-//                .issuedAt(issuedAt)
-//                .claims(extraClaims)
-//                .signWith(, Jwts.SIG.HS256)
-//                .compact();
-        SecretKey key = Jwts.SIG.HS256.key().build();
-        String jws = Jwts.builder().subject(subject).signWith(key).compact();
-        return jws;
+
+        Map<String, Object> extraClaims = buildExtraClaims();
+
+        String jwt = buildJwt(extraClaims, subject);
+
+        return jwt;
     }
 
-    public SecretKey getSecretKey(){
+    private String buildJwt(Map<String, Object> extraClaims, String subject){
+        Date issuedAt = new Date(System.currentTimeMillis());
+        Date expiration = new Date(issuedAt.getTime() + EXPIRATION_IN_MINUTES * 60 * 1000);
+        String jwt = Jwts.builder()
+                .header()
+                .type("JWT")
+                .and()
+                .subject(subject)
+                .expiration(expiration)
+                .issuedAt(issuedAt)
+                .claims(extraClaims)
+                .signWith(getSecretKey(), Jwts.SIG.HS256)
+                .compact();
+        return jwt;
+    }
+
+    public void verificarJwt(String jwt){
+        try{
+            Claims payload = verifyJws(jwt);
+            System.out.println(payload.getSubject());
+        }catch(JwtException e){
+            System.out.println("Error verificando token: " + e.getMessage());
+        }
+    }
+
+    private static Claims verifyJws(String jwt){
+        return Jwts.parser().verifyWith(getSecretKey()).build().parseSignedClaims(jwt).getPayload();
+    }
+
+    private static Map<String, Object> buildExtraClaims(){
+        Map<String, Object> extraClaims = new HashMap<>();
+        extraClaims.put("name", "frariana c");
+        return extraClaims;
+    }
+
+    private static SecretKey getSecretKey(){
         return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
     }
 }

@@ -49,6 +49,7 @@ public class UserController {
         res.setToken(user.getToken());
         res.setIsactive(user.isIsactive());
         res.setToken(user.getToken());
+        jwt.verificarJwt(user.getToken());
         return res;
     }
 
