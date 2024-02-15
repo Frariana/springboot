@@ -1,6 +1,7 @@
 package com.springboot.controller;
 
 import com.springboot.model.User;
+import com.springboot.jwt.Jwt;
 import com.springboot.model.UserResponse;
 import com.springboot.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,16 +10,19 @@ import com.springboot.error.UserNotFoundException;
 import com.springboot.error.EmailExistentException;
 import jakarta.validation.Valid;
 
+
 import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.Date;
-
+import java.lang.String;
+import java.lang.Object;
 
 @RestController
 @RequestMapping("api/users")
 public class UserController {
+    Jwt jwt = new Jwt();
 
     @Autowired
     private UserService userService;
@@ -37,14 +41,18 @@ public class UserController {
     public UserResponse createUser(@Valid @RequestBody User user) throws EmailExistentException{
         user.setIsactive(true);
         user.setCreated(new Date());
+        user.setToken(jwt.getJwt(user.getEmail()));
         UserResponse res = new UserResponse();
         userService.create(user);
         res.setId(user.getId_user().toString());
         res.setCreated(user.getCreated());
         res.setToken(user.getToken());
         res.setIsactive(user.isIsactive());
+        res.setToken(user.getToken());
         return res;
     }
+
+
 
     @DeleteMapping("{id}")
     public void deleteUserById(@PathVariable("id") UUID id){
