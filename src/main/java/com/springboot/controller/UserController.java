@@ -1,6 +1,7 @@
 package com.springboot.controller;
 
 import com.springboot.model.User;
+import com.springboot.model.Login;
 import com.springboot.jwt.Jwt;
 import com.springboot.model.UserResponse;
 import com.springboot.service.UserService;
@@ -9,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 import com.springboot.error.UserNotFoundException;
 import com.springboot.error.EmailExistentException;
 import jakarta.validation.Valid;
-
 
 import java.util.List;
 import java.util.HashMap;
@@ -22,17 +22,18 @@ import java.lang.Object;
 @RestController
 @RequestMapping("api/users")
 public class UserController {
+
     Jwt jwt = new Jwt();
 
     @Autowired
     private UserService userService;
 
-    @GetMapping("/")
+    @GetMapping("/vertodos")
     public List<User> getAllUsers(){
         return userService.getAllUsers();
     }
 
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     public User searchUserById(@PathVariable("id") UUID id) throws UserNotFoundException{
         return userService.getUserById(id);
     }
@@ -49,22 +50,35 @@ public class UserController {
         res.setToken(user.getToken());
         res.setIsactive(user.isIsactive());
         res.setToken(user.getToken());
-        jwt.verificarJwt(user.getToken());
         return res;
     }
 
-
+    @GetMapping("/login")
+    public Map<String, Object> login(@Valid @RequestBody Login login){
+        Map<String, Object> json = new HashMap<>();
+        if (userService.login(login)){
+            json.put("email", login.getEmail());
+            json.put("token", jwt.getJwt(login.getEmail()));
+        }else{
+            json.put("error", "Usuario o contraseña incorrectos");
+        }
+        return json;
+    }
 
     @DeleteMapping("{id}")
     public void deleteUserById(@PathVariable("id") UUID id){
         userService.deleteUser(id);
     }
 
-    @GetMapping("/test")
-        public Map<String, Object> get() {
+    @GetMapping("/listar_users/{token}")
+    public Map<String, Object> get(@PathVariable("token") String token) {
         Map<String, Object> map = new HashMap<>();
-        map.put("key1", "value1");
-        map.put("results", "value2");
+        boolean estado = jwt.verificarJwt(token);
+        if (jwt.verificarJwt(token)){
+            map.put("Users", userService.getAllUsers());
+        }else{
+            map.put("Estado token", "fraude");
+        }
         return map;
     }
 }

@@ -41,12 +41,12 @@ public class Jwt {
         return jwt;
     }
 
-    public void verificarJwt(String jwt){
+    public boolean verificarJwt(String jwt){
         try{
             Claims payload = verifyJws(jwt);
-            System.out.println(payload.getSubject());
+            return true;
         }catch(JwtException e){
-            System.out.println("Error verificando token: " + e.getMessage());
+            return false;
         }
     }
 
