@@ -8,6 +8,7 @@ import com.springboot.error.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import jakarta.validation.constraints.Email;
+import com.springboot.jwt.Jwt;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,6 +18,8 @@ import java.util.Date;
 
 @Component
 public class UserService {
+
+    Jwt jwt = new Jwt();
 
     @Autowired
     private UserRepository userRepository;
@@ -33,23 +36,23 @@ public class UserService {
         if (!pat.matcher(user.getEmail()).matches()){
             throw new EmailExistentException("Email tiene formato incorrecto, debe ser: aaaaaaa@dominio.cl");
         }
+        user.setToken(jwt.getJwt(user.getEmail()));
         return userRepository.save(user);
     }
 
-    public boolean login(Login login){
+    public String login(Login login){
         List<User> usersExistentes = userRepository.findAll();
+        String token = "";
         for (User userAct : usersExistentes) {
             if (login.getEmail().equalsIgnoreCase(userAct.getEmail()) && userAct.getPassword().equals(login.getPassword())) {
-                ultimoLogin(userAct);
-                return true;
+                token = jwt.getJwt(login.getEmail());
+                userAct.setLast_login(new Date());
+                userAct.setToken(token);
+                userRepository.save(userAct);
+                return token;
             }
         }
-        return false;
-    }
-
-    private void ultimoLogin(User user){
-        user.setLast_login(new Date());
-        userRepository.save(user);
+        return token;
     }
 
     public User getUserById(UUID id) throws UserNotFoundException{

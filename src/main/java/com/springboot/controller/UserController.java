@@ -42,23 +42,23 @@ public class UserController {
     public UserResponse createUser(@Valid @RequestBody User user) throws EmailExistentException{
         user.setIsactive(true);
         user.setCreated(new Date());
-        user.setToken(jwt.getJwt(user.getEmail()));
+        User usuario_creado = userService.create(user);
         UserResponse res = new UserResponse();
-        userService.create(user);
-        res.setId(user.getId_user().toString());
-        res.setCreated(user.getCreated());
-        res.setToken(user.getToken());
-        res.setIsactive(user.isIsactive());
-        res.setToken(user.getToken());
+        res.setId(usuario_creado.getId_user().toString());
+        res.setCreated(usuario_creado.getCreated());
+        res.setToken(usuario_creado.getToken());
+        res.setIsactive(usuario_creado.isIsactive());
+        res.setToken(usuario_creado.getToken());
         return res;
     }
 
     @GetMapping("/login")
     public Map<String, Object> login(@Valid @RequestBody Login login){
         Map<String, Object> json = new HashMap<>();
-        if (userService.login(login)){
+        String token = userService.login(login);
+        if (!token.isEmpty()){
             json.put("email", login.getEmail());
-            json.put("token", jwt.getJwt(login.getEmail()));
+            json.put("token", token);
         }else{
             json.put("error", "Usuario o contraseña incorrectos");
         }
