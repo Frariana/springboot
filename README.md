@@ -26,11 +26,11 @@ POST http://localhost:8080/api/users/password
 raw:
 ```json
 {
-   "opcionalMayusculas":"true",
-   "opcionalNumeros":"true",
-   "opcionalSignos":"true",
+   "opcionalMayusculas":"false",
+   "opcionalNumeros":"false",
+   "opcionalSignos":"false",
    "longitudMinima":"4",
-   "longitudMaxima":"10"
+   "longitudMaxima":"50"
 }
 ```
 2. Crear usuarios
