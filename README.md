@@ -1,29 +1,21 @@
-API REST
-----------------
-CREACIÓN DE USUARIOS
+# API REST
 
-    Validaciones
-        Campos importantes requeridos
-        Email único
-        Email validado por medio de expresión regular 
-        Clave regida bajo expresion regular configurable
-
-MANEJO DE EXCEPCIONES
-
-BASE DE DATOS: H2
-
-PERSISTENCIA: Hibernate
-
-TOKEN JWT
-
-MAVEN
-
-JAVA 17 
-
-INSTRUCCIONES:
-1. Crear formato de password
-POST http://localhost:8080/api/users/password
-raw:
+### CREACIÓN DE USUARIOS
+* Validaciones:
+  * Campos importantes requeridos
+  * Email único
+  * Email validado por medio de expresión regular 
+  * Clave regida bajo expresion regular configurable
+### CARACTERÍSTICAS
+* Manejo de excepciones
+* Base de datos H2: http://localhost:8080/h2-ui
+* Persistencia con hibernate
+* Token JWT
+* Maven
+* Java 17 
+* Swagger con springdoc http://localhost:8080/swagger-ui 
+### INSTRUCCIONES
+1. Crear formato de password: POST http://localhost:8080/api/users/password
 ```json
 {
    "opcionalMayusculas":"false",
@@ -33,11 +25,7 @@ raw:
    "longitudMaxima":"50"
 }
 ```
-2. Crear usuarios
-POST http://localhost:8080/api/users
-   JSON
-
-raw:
+2. Crear usuarios: POST http://localhost:8080/api/users
 ```json
 {
     "name": "Frariana Castro",
@@ -55,10 +43,7 @@ raw:
 }
 
 ```
-3. Iniciar sesión
-GET http://localhost:8080/api/users/login
-JSON
-raw:
+3. Iniciar sesión: GET http://localhost:8080/api/users/login
 ```json
 {
     "email": "frarianacastro@gmail.com",
