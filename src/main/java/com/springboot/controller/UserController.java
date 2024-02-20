@@ -2,9 +2,11 @@ package com.springboot.controller;
 
 import com.springboot.model.User;
 import com.springboot.model.Login;
+import com.springboot.model.Password;
 import com.springboot.jwt.Jwt;
 import com.springboot.model.UserResponse;
 import com.springboot.service.UserService;
+import com.springboot.service.PasswordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import com.springboot.error.UserNotFoundException;
@@ -27,6 +29,8 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private PasswordService passwordService;
 
     @GetMapping("/vertodos")
     public List<User> getAllUsers(){
@@ -39,17 +43,35 @@ public class UserController {
     }
 
     @PostMapping
-    public UserResponse createUser(@Valid @RequestBody User user) throws EmailExistentException{
-        user.setIsactive(true);
-        user.setCreated(new Date());
-        User usuario_creado = userService.create(user);
-        UserResponse res = new UserResponse();
-        res.setId(usuario_creado.getId_user().toString());
-        res.setCreated(usuario_creado.getCreated());
-        res.setToken(usuario_creado.getToken());
-        res.setIsactive(usuario_creado.isIsactive());
-        res.setToken(usuario_creado.getToken());
-        return res;
+    public Map<String, Object> createUser(@Valid @RequestBody User user) throws EmailExistentException{
+        Map<String, Object> map = new HashMap<>();
+        if (passwordService.existeFormatoCreado()){
+            user.setIsactive(true);
+            user.setCreated(new Date());
+            User usuario_creado = userService.create(user);
+            UserResponse res = new UserResponse();
+            res.setId(usuario_creado.getId_user().toString());
+            res.setCreated(usuario_creado.getCreated());
+            res.setToken(usuario_creado.getToken());
+            res.setIsactive(usuario_creado.isIsactive());
+            res.setToken(usuario_creado.getToken());
+            map.put("user", res);
+        }else{
+            map.put("message", "No existe formato creado de password, debe configurar para permitir la creación de ususarios");
+        }
+        return map;
+    }
+
+    @PostMapping("/password")
+    public Map<String, Object> createPassword(@Valid @RequestBody Password password){
+        Map<String, Object> json = new HashMap<>();
+        if (!passwordService.existeFormatoCreado()) {
+            passwordService.create(password);
+        }else{
+            passwordService.update(password);
+        }
+        json.put("message", "Formato password creado");
+        return json;
     }
 
     @GetMapping("/login")
@@ -77,7 +99,7 @@ public class UserController {
         if (jwt.verificarJwt(token)){
             map.put("Users", userService.getAllUsers());
         }else{
-            map.put("Estado token", "fraude");
+            map.put("Estado token", "fail");
         }
         return map;
     }

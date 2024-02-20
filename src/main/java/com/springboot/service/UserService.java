@@ -3,7 +3,9 @@ package com.springboot.service;
 import com.springboot.error.EmailExistentException;
 import com.springboot.model.User;
 import com.springboot.model.Login;
+import com.springboot.model.Password;
 import com.springboot.repository.UserRepository;
+import com.springboot.service.PasswordService;
 import com.springboot.error.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -23,6 +25,8 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private PasswordService passwordService;
 
     public User create(User user) throws EmailExistentException {
         List<User> usersExistentes = userRepository.findAll();
@@ -32,11 +36,15 @@ public class UserService {
             }
         }
         //Validar mail expresion regular
-        Pattern pat = Pattern.compile("^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@" + "[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$");
+        String patron = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
+        Pattern pat = Pattern.compile(patron);
         if (!pat.matcher(user.getEmail()).matches()){
             throw new EmailExistentException("Email tiene formato incorrecto, debe ser: aaaaaaa@dominio.cl");
         }
-        user.setToken(jwt.getJwt(user.getEmail()));
+        //Validar password con formato
+        if (!passwordService.validar(user.getPassword())){
+            throw new EmailExistentException("Email tiene formato incorrecto, debe ser: aaaaaaa@dominio.cl");
+        }
         return userRepository.save(user);
     }
 

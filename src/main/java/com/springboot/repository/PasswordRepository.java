@@ -1,12 +1,11 @@
 package com.springboot.repository;
 
-import com.springboot.model.User;
 import java.util.List;
-import java.util.UUID;
+import com.springboot.model.Password;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, UUID>{
+public interface PasswordRepository extends JpaRepository<Password, Long>{
 }
